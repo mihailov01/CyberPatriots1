@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>РОСМЕДЗРЕНИЕ</title>
+    <link rel="icon" href="{% static 'main/img/icon.png' %}"> <!-- 32×32 -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <script type="text/javascript" src="{% static 'main/js/jquery-3.3.1.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'main/js/import.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'main/css/import.css' %}">
+</head>
+<body>
+    <header>
+        <div class="header_container">
+            <div class="header_inner">
+                <div class="header_left">
+                    <img class="header_logo" src="{% static 'main/img/logo.png' %}" alt="">
+                </div>
+                <div class="header_nav">
+                    <div class="ul1">
+                        <div class="logoul1"></div>
+                        <ul style="text-align: center;"><a href="#" class="header_nav_link" id="clicker" >Разметка<br>исследований</a></ul> 
+                    </div>
+                    <div class="ul2">
+                        <div class="logoul2"></div>
+                        <ul style="text-align: center;"><a href="#" class="header_nav_link" id="clickur">Генерация<br>исследований</a></ul>
+                    </div>
+                        <ul style="text-align: center;margin-top: 24px;"><a href="/accounts/login/" class="header_nav_link_vxod" id="clicker" >Выход</a></ul>  
+                </div> 
+            </div>
+        </div>
+    </header>
+   
+    <div class="markup" id="markup" >
+       <div id="neew"> Разметка исследований</div>
+       <div class="table_container">
+            <button class="addrow" onclick="window.location.href = 'create';" id="addrow">Добавить исследование </button>
+            <div class="table">
+                <table id="table">
+                    <tbody>
+                    {% if tasks %}
+                        <tr>
+                            <td>№</td>
+			                <td>Название исследования</td>
+			                <td>Дата изменения</td>
+			                <td>Статус</td>
+                            <td>Рабочий файл</td>
+                            <td>Начать исследование</td>
+		                </tr>
+                     
+                        {% for i in tasks %}
+                        <tr>
+                            <td>{{i.numbers}}</td>
+			                <td>{{i.title}}</td>
+			                <td>{{i.created_date}}</td>
+			                <td>{{i.status}}</td>
+                            <td><a href="{{i.file.url}}">{{i.file}}</a></td>
+                            <td><a href="{% url 'start_funk2' i.pk %}"><button>Начать исследование</button></a></td>
+		                </tr>
+                        {% endfor%}
+                    {% else%}
+                        <p>Записей нет! Создайтей новую запись с помощью кнопки выше!</p>
+                    {% endif %}
+	                </tbody>
+                </table>
+            </div>
+<!--             тут было-->
+        </div>
+    </div>
+
+    <div class="generation" id="generation">
+        Генерация исследований    
+        <div class="table_container">
+            <button class="addrow" onclick="window.location.href = 'create2';" id="addrow2">Добавить исследование</button>
+            <div class="table2">
+                <table id="table2">
+                    <tbody>
+                    {% if tasks_auto %}
+                        <tr>
+                            <td>№</td>
+			                <td>Название</td>
+                            <td>Дата исследования</td>
+			                <td>Статус</td>
+                            <td>Исследуемый файл</td>
+			                <td>Начать исследование</td>
+		                </tr>
+                        {% for i in tasks_auto %}
+                        <tr>
+                            <td>{{i.numbers_a}}</td>
+			                <td>{{i.title_a}}</td>
+			                <td>{{i.created_date_a}}</td>
+			                <td>{{i.status_a}}</td>
+                            <td><a href="{{i.file_a.url}}">{{i.file_a}}</a></td>
+                            <td><a href="{% url 'start_funk' i.pk %}"><button>Начать исследование</button></a></td>
+		                </tr>
+                        {% endfor%}
+                    {% else%}
+                        <p>Записей нет! Создайтей новую запись с помощью кнопки выше!</p>
+                    {% endif %}
+	                </tbody>
+                </table>
+            </div>
+<!-- тут -->
+        </div>
+    </div>
+
+    <footer id="footer"></footer>  
+</body>
+</html>
+
+
+
+
+<!-- <a target="_blank" href="https://icons8.com/icon/IaGiInDB8lfE/ментальная-карта">Ментальная карта</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a> -->

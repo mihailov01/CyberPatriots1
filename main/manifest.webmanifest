@@ -1,0 +1,5 @@
+{
+    "icons": [
+      { "src": "static/main/img/icon.png", "type": "image/png", "sizes": "32x32" }
+    ]
+  }

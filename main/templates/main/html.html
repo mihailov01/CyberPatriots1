@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>РОСМЕДЗРЕНИЕ</title>
+  <link rel="icon" href="{% static 'main/img/icon.png' %}"> <!-- 32×32 -->
+  <link rel="manifest" href="../../manifest.webmanifest">
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-168693757-2"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'main/css/stylesheet.css' %}" media="screen"/>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-168693757-2');
+    </script>
+</head>
+
+<body onload="setData()">
+
+  <div id="wrapper">
+
+    <div id="upperLeftInfoBar" class="noselect" style="top:10px; z-index:-1000;"> </div>
+    
+    <canvas id = "UnseenCanvasThr" width="512" height="512"></canvas>
+    <canvas id = "UnseenCanvas" width="512" height="512"></canvas>
+    <canvas id = "UnseenCanvasMask" width="512" height="512"></canvas>
+    <canvas id = "UnseenCanvasVis" width="512" height="512"></canvas>
+    <canvas id = "bg_canvas" width="1024" height="1024"></canvas>
+    <canvas id = "pr_canvas" width="512" height="512"></canvas>
+    <canvas id = "vis_canvas" width="512" height="512"></canvas>
+    
+    <input type="range" class="slider" id="myRange" style="width: 467px; right: -284px; top: 225px;">
+</div>
+
+
+<div id="allText">
+
+    
+    <label title="Выбор NifTi/DICOM" class="labelForInputFile" for="file">Открыть файл</label>
+    <p style="margin-top: 47px;margin-left: 5px;">Откройте файл {{name_file}}</p>
+    <input type="file" class="inputfile" id="file" value="{{name_file}}" multiple/>
+    
+    
+   
+    
+    <img src="{% static 'main/img/keyboard.png' %}" id="controlsModalBtn" class="clickableImage" style="width: 45px; top: 75px; right: 80%; position: absolute;" title="Клавиши клавиатуры"></img>
+    <img src="{% static 'main/img/save.png' %}" class="clickableImage" style="width: 40px; top: 75px; right: 44%; position: absolute;" onclick="downloadSegmentation()" title="Сохранение маски"></img>
+
+    
+    <div id="buttonsForTouch" style="height: 35px">  </div>
+    
+    <div id="uglysliders" style="height:470px">
+        <input class="pointerCursor" type="checkbox" id="pixelValChBox" onclick="changePixValAct();">
+        <label title="Отображать значение вокселя необработанных данных, значение маски и, если задано имя, название соответствующей маски" for="pixelValChBox" >Показать информацию о вокселе</label>
+        <div style="height: 0px"></div>
+        
+        
+        <!-- removed showing total segmentation volume -->
+        <div style="display:none">
+            <input class="pointerCursor" type="checkbox" id="segVolumeChBox" onclick="changeSegVolumeShow();"> 
+            <label title="Display total segmentation volume live" for="segVolumeChBox"> Show total mask volume</label>
+            <br>
+            <small>(performance killer)</small><br>
+        </div>
+        
+        <div style="top: 10px;margin-bottom: -35px;" >Для сохранения значения, передвигая ползунок, нажмите клавишу "Tab" и нажмите в любом свободном месте</div>
+        <br><br>
+        <div>Размер указателя:</div>
+        <input type="range" id="pointerSizeRange" style="width: 50%; height: 12px" value="20" step="0.1">
+        <input type="text" id="pointerSizeText" style="width: 26px" value="20" oninput="changePointerSize()">
+        <img src="{% static 'main/img/reset.png' %}" class="clickableImage" title="Сброс до 20" style="width: 20px; position:absolute" onclick="resetPointerSize()"></img>
+
+        <div style="height: 6px"></div>
+        <div>Прозрачность указателя:</div>
+        <input type="range" id="pointerOpacityRange" style="width: 50%; height: 12px" value="0.3" step="0.01" max=1>
+        <input type="text" id="pointerOpacityText" style="width: 22px" value="0.3" oninput="changePointerOpacity(value, 'no')">
+        <img src="{% static 'main/img/reset.png' %}" class="clickableImage" title="Сброс до 0.3" style="width: 20px; position:absolute" onclick="changePointerOpacity(0.3)"></img>
+
+
+        <div style="height: 6px"></div>
+        <div>Прозрачность маски:</div>
+        <input type="range" id="maskOpacityRange" style="width: 50%; height: 12px" value="0.7" step="0.01" max="1">
+        <input type="text" id="maskOpacityText" style="width: 22px;" value="0.7" oninput="changeMaskOpacity(value, 'no')">
+        <img src="{% static 'main/img/reset.png' %}" class="clickableImage" title="Сброс до 0.7" style="width: 20px; position:absolute" onclick="changeMaskOpacity(0.7)"></img>
+        
+        <!-- Threshold -->
+        <div style="height: 60px"></div>
+        <input class="pointerCursor" type="checkbox" id="threshChBox" onclick="changeThresh();">
+        <label title="Активация порога сегментации" for="threshChBox"> Порог</label>
+        <div style="height: 6px"></div>
+        
+        <div id="thresholdSettingsDiv" style="visibility: hidden; margin-top: -15px;" >
+            <!-- Min -->
+            <div><div style="width: 32px; float:left" > Минимум </div></div><br>
+            <input type="range" id="minThrRange" style="width: 50%; height: 12px;" value="0" step="0.1" max=1>
+            <input type="text" id="minThrText" style="width: 40px" value="0" oninput="changeThresh()" >
+            <img src="{% static 'main/img/reset.png' %}" class="clickableImage" title="Сброс" style="width: 20px; position:absolute" onclick="minThrText.value=Math.floor(minThreshold); changeThresh()"></img>
+            <div style="height: 4px"></div>
+
+            <!-- Max -->
+            <div><div style="width: 32px; float:left" > Максимум </div></div><br>
+            <input type="range" id="maxThrRange" style="width: 50%; height: 12px" value="100" step="0.1" max=1 > 
+            <input type="text" id="maxThrText" style="width: 40px" value="1" oninput="changeThresh()">
+            <img src="{% static 'main/img/reset.png' %}" class="clickableImage" title="Сброс" style="width: 20px; position:absolute" onclick="maxThrText.value=Math.ceil(maxThreshold); changeThresh()"></img>
+        </div>
+
+
+        <div id="thresholdPredictionDiv" style="visibility: hidden; position: absolute; top: 500px; width:95%" >
+            <input type="range" id="predThr" style="width: 90%; height: 12px" value="0.75" step="0.0001" max = 1 min = 0 oninput="thectx.predictionToSeg()">
+            <img src="{% static 'main/img/reset.png' %}" class="clickableImage" title="Reset to prediction threshold of 0.5" style="width: 20px; position:absolute" onclick="predThr.value=0.75; changeThresh(); thectx.predictionToSeg()"></img>
+        </div>
+
+    </div>
+
+
+    <img src="{% static 'main/img/full_screen.png' %}" id="fullscreenImage" class="clickableImage" style="width: 35px; top: 366px; right: 83%; position: absolute;" onclick="fullscreenSwitch()" title="Режим полного экрана"></img>
+    <img src="{% static 'main/img/turn.png' %}" class="clickableImage" style="width: 38px; top: 366px; right: 66%; position: absolute;" id="rotate90Button" onclick="rot90CSS()" title="Поворот изображения на 90 градусов"></img>
+    <img src="{% static 'main/img/reflect.png' %}" class="clickableImage" style="width: 40px; top: 366px; right: 49%; position: absolute;" onclick="mirrorCSS()" title="Отражение"></img>
+
+    
+
+    <!-- <button id="fillScreenButton" onclick="fitToScreen()">Fit to screen</button>
+    <button id="shringkScreenButton" onclick="resizeCanvas(512)">Resize to 512 x 512</button> -->
+    
+    <!-- <div style="height: 160px">  </div> -->
+
+    <!-- <h2>Anything for my princess</h2> -->
+</div>
+<!-- Modal stuff -->
+<!-- View controls modal -->
+<div id="controlsModal" class="modal">
+        <div class="modal-content" id="controlsModalContent">
+          <span class="close" id="closeKeybindingsModal">&times;</span>
+          
+          <div id="Keybindings"></div>
+          <br>
+          <b>Mouse shortcuts (not changeable):</b><br>
+          Left mouse button: Segment<br>
+          Right mouse button: Erase<br>
+          Mouse wheel press: Windowing<br>
+          Mouse wheel scroll: Change slices<br>
+          Ctrl + left mouse button: Pan<br>
+          Ctrl + right mouse button: Zoom<br>
+          Ctrl + mouse scroll: Zoom<br><br>
+        </div>
+    
+</div>
+
+<!-- Models modal -->
+<div id="modelsModal" class="modal">
+    <div class="modal-content">
+
+
+        <span class="close" id="closeModelsModal">&times;</span>
+        <br>
+        <b>Main 2d model:</b><br>
+        
+        <div id="selectedModelText"> Select main model to load and wait for this text to update. </div>
+        
+
+        <!-- kneeDeep evt. show -->
+        <div id="kneeDeepDiv" style="display: none"> 
+            <br>
+            <button class="modalButton" onclick="selectKneeDeepModel()">Laste inn kneeDeep modell (vann) (125 Mb)</button>
+            <br>
+            <button class="modalButton" onclick="selectKneeDeepModelv5()">Laste inn seneste kneeDeep modell, V5 (vann) (125 Mb)</button>
+            <br>
+            <!-- <button class="modalButton" onclick="selectKneeDeepGrade3Model()">Laste inn kneeDeep grad 3 modell (vann) (125 Mb)</button>
+            <br>
+            <button class="modalButton" onclick="selectKneeDeepGrade3Modelv2()">Laste inn kneeDeep grad 3 v2 modell (vann) (125 Mb)</button>
+            <br> -->
+            <button class="modalButton" onclick="selectKneeDeepFatModel()">Laste inn kneeDeep modell (fett) (125 Mb)</button>
+            <br>
+            <button class="modalButton" onclick="selectKneeDeepGrade2Modelv4()">Laste inn kneeDeep grad 2 modell (125 Mb)</button>
+            <br>
+        
+        
+        </div>
+        
+
+        
+        v2 is beta. 
+        While holding left mouse button pressed, use "w" and "s" to change guide pointer size               
+        
+        <br><br>
+
+
+        <!-- <b>Advanced settings:</b><br>
+        <input type="checkbox" id="windowImDataChBox" onclick="changeWindImData();">
+        Predict on windowed image data instead of raw data (it still gets normalized)<br>
+        -->                  
+
+                        
+        <br><br>
+
+    </div>
+</div>
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/settings.js' %}"></script>
+<script type="text/javascript" src="{% static 'main/js/nifti-reader.js' %}"></script>
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/imageLoad.js' %}"></script>
+
+
+<script src="{% static 'main/js/itk.js' %}"></script>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/1.5.2/tf.min.js"></script>
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/nv.js' %}"></script>  <!-- ПОДГРУЗКА ОКНА ВРАЙПЕР -->
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/otherFunctions.js' %}"></script>
+
+
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/multilabel.js' %}"></script>
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/startupConditions.js' %}"></script>   <!-- РИСУЕТ -->
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/volumeAnalysis.js' %}"></script> <!-- ЗАГРУЗКА ИЗОБРАЖЕНИЯ -->
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/subsegmenting.js' %}"></script>
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/matrixMultiplication.js' %}"></script>
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/keybindings.js' %}"></script>
+
+
+
+
+<script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script
+async
+type="text/javascript"
+src="https://apis.google.com/js/api.js"
+onload="gapiLoaded()"
+></script>
+
+<script>
+    //this will run only when loading is complete
+    let welcomeImage = new Image;
+    welcomeImage.src = "./images/Welcome_to_MedSeg.png"
+    welcomeImage.onload = function() {
+        drop_ctx.drawImage(welcomeImage,0,0,1024,1024)
+    }
+</script>
+
+</body>
+</html>

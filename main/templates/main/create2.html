@@ -1,0 +1,42 @@
+{% load static %}
+<title>Создание исследования</title>
+<link rel="icon" href="{% static 'main/img/icon.png' %}"> <!-- 32×32 -->
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="stylesheet" href="{% static 'main/css/import.css' %}">
+<script type="text/javascript" src="{% static 'main/js/jquery-3.3.1.min.js' %}"></script>
+<script rel="stylesheet" href="{% static 'main/js/import.js' %}"></script>
+<script type="text/javascript" Cache-control: max-age=86400, must-revalidate src="{% static 'main/js/imageLoad.js' %}"></script>
+
+
+<div class="new_task_container" style="width: 100%;max-width: 648px;margin: 0 0;max-height: 300px;margin-top:200px;">
+    <form method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <div class="new_task" id="newTask">
+            <div class="main_task">
+                <div class="content">
+                    <div style="margin: -100px -17px auto 10px;">
+                        <label for="name" class="label">Введите название исследования</label>
+                        {{form.file_a}}
+                        {{form.numbers_a}}
+                        {{form.title_a}}
+                        {{form.created_date_a}}
+                        {{form.status_a}}
+                    </div>
+                    <button class="task_button" id="taskButton" onclick="buttonClick()">Создать</button>
+                    <span>{{ error }}</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+    function submitForm(){
+        if(typeof(localStorage) != "undefined"){
+            localStorage.file = document.getElementById("file2").value;
+        }
+        document.getElementById("form").submit();
+    }
+    </script>

@@ -1,0 +1,32 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>РОСМЕДЗРЕНИЕ</title>
+    <link rel="icon" href="../../static/main/img/icon.png"> <!-- 32×32 -->
+    <link rel="manifest" href="../../manifest.webmanifest">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/stylesheet.css' %}" media="screen"/>
+	<script type="text/javascript" src="{% static 'main/js/import.js' %}"></script>
+
+</head>
+<body>
+    <script>
+        var val = document.getElementById("valR").value;
+    document.getElementById("range").innerHTML=val;
+    document.getElementById("img").src ="../../../media/documents/png2/slice" + val + ".png";
+    function showVal(newVal){
+      document.getElementById("range").innerHTML=newVal;
+      document.getElementById("img").src ="../../../media/documents/png2/slice" + newVal+ ".png";
+    }
+</script>
+    <input id="valR" type="range" min="0" max="41" value="0" step="1" oninput="showVal(this.value)" onchange="showVal(this.value)" />
+    <span id="range">0</span>
+    <img src="../../../media/documents/png2/" id="img">
+
+
+</body>
+</html>
